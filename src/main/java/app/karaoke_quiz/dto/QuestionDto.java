@@ -1,13 +1,20 @@
 package app.karaoke_quiz.dto;
 
-public record QuestionDto(
-        Long id,
-        Long songId,
-        String text,
-        String optionA,
-        String optionB,
-        String optionC,
-        String optionD,
-        String correct,
-        String type
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class QuestionDto {
+    private Long id;
+    private Long songId;
+    private String text;
+    private String optionA;
+    private String optionB;
+    private String optionC;
+    private String optionD;
+    private String correct;
+    private String type;
+}

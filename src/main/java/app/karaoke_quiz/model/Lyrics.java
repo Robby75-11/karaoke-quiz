@@ -14,9 +14,9 @@ public class Lyrics {
     @JoinColumn(name = "song_id")
     private Song song;
 
-    @Lob
+    @Column(length = 5000)
     private String text;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String syncData;// JSON per sincronizzazione (opzionale)
    }

@@ -1,3 +1,13 @@
 package app.karaoke_quiz.dto;
 
-public record QuizResultDto(int total, int correct) {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class QuizResultDto {
+    private int total;
+    private int correct;
+}

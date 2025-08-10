@@ -1,4 +1,4 @@
 package app.karaoke_quiz.service;
 
-public class QuenstionService {
+public class QuestionService {
 }

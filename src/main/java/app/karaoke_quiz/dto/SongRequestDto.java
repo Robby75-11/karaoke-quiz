@@ -1,11 +1,18 @@
 package app.karaoke_quiz.dto;
 
-record SongRequestDto(
-        String title,
-        Integer year,
-        String author,
-        String album,
-        String audioUrl,
-        String coverImageUrl,
-        Long artistId
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SongRequestDto {
+    private String title;
+    private Integer year;
+    private String author;
+    private String album;
+    private String audioUrl;
+    private String coverImageUrl;
+    private Long artistId;
+}

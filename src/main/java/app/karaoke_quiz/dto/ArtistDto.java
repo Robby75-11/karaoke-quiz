@@ -1,3 +1,15 @@
 package app.karaoke_quiz.dto;
 
-public record ArtistDto(Long id, String name, String imageUrl, String bio) {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ArtistDto {
+    private Long id;
+    private String name;
+    private String imageUrl;
+    private String bio;
+}

@@ -1,10 +1,11 @@
 package app.karaoke_quiz.exception;
 
-
+import app.karaoke_quiz.model.ApiError;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 
@@ -12,32 +13,32 @@ import java.time.LocalDateTime;
 public class CustomizedExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public it.albergo.test.demo.exception.ApiError notFoundExceptionHandler(NotFoundException e){
-        it.albergo.test.demo.exception.ApiError error = new it.albergo.test.demo.exception.ApiError();
+    public ResponseEntity<ApiError> notFoundExceptionHandler(NotFoundException e, WebRequest request){
+        ApiError error = new ApiError();
         error.setMessage(e.getMessage());
-        error.setDataErrore(LocalDateTime.now());
-        return error;
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.NOT_FOUND.value());
+        error.setPath(request.getDescription(false));
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public it.albergo.test.demo.exception.ApiError validationExceptionHandler(ValidationException e){
-        it.albergo.test.demo.exception.ApiError error = new it.albergo.test.demo.exception.ApiError();
+    public ResponseEntity<ApiError> validationExceptionHandler(ValidationException e, WebRequest request){
+        ApiError error = new ApiError();
         error.setMessage(e.getMessage());
-        error.setDataErrore(LocalDateTime.now());
-        return error;
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setPath(request.getDescription(false));
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UnAuthorizedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public it.albergo.test.demo.exception.ApiError unauthorizedExceptionHandler(UnAuthorizedException e) {
-        it.albergo.test.demo.exception.ApiError error = new it.albergo.test.demo.exception.ApiError();
+    public ResponseEntity<ApiError> unauthorizedExceptionHandler(UnAuthorizedException e, WebRequest request) {
+        ApiError error = new ApiError();
         error.setMessage(e.getMessage());
-        error.setDataErrore(LocalDateTime.now());
+        error.setTimestamp(LocalDateTime.now());
         error.setStatus(HttpStatus.UNAUTHORIZED.value());
-        error.setError(HttpStatus.UNAUTHORIZED.getReasonPhrase());
-        return error;
+        error.setPath(request.getDescription(false));
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
-
 }

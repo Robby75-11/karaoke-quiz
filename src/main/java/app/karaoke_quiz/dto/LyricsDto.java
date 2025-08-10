@@ -1,3 +1,14 @@
 package app.karaoke_quiz.dto;
 
-public record LyricsDto(Long songId, String text, String syncData) {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LyricsDto {
+    private Long songId;
+    private String text;
+    private String syncData;
+}
