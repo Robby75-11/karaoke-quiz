@@ -64,7 +64,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // auth pubblica
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                         //   .requestMatchers(HttpMethod.GET, "/api/songs/**", "/api/artists/**", "/api/lyrics/**", "/api/quiz/**").permitAll()
                         // tutto il resto autenticato

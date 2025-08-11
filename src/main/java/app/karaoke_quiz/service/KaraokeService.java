@@ -1,8 +1,9 @@
+// app/karaoke_quiz/service/KaraokeService.java
 package app.karaoke_quiz.service;
 
 import app.karaoke_quiz.dto.ArtistDto;
-import app.karaoke_quiz.dto.QuizQuestionPlayDto;
 import app.karaoke_quiz.dto.LyricsDto;
+import app.karaoke_quiz.dto.QuizQuestionPlayDto;
 import app.karaoke_quiz.dto.SongResponseDto;
 
 import java.util.List;
