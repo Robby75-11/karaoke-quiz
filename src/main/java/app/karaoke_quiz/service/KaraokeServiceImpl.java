@@ -156,10 +156,29 @@ public class KaraokeServiceImpl implements KaraokeService {
         return new ArtistDto(a.getId(), a.getName(), a.getImageUrl(), a.getBio());
     }
 
+    private String toLetter(String correctColumn) {
+        if (correctColumn == null) return null;
+        switch (correctColumn.trim().toLowerCase()) {
+            case "optiona": case "a": return "A";
+            case "optionb": case "b": return "B";
+            case "optionc": case "c": return "C";
+            case "optiond": case "d": return "D";
+            default: return null;
+        }
+    }
+
     private QuizQuestionPlayDto toQuizQuestionPlayDto(Question q) {
         return new QuizQuestionPlayDto(
-                q.getId(), q.getSongId(), q.getText(),
-                q.getOptionA(), q.getOptionB(), q.getOptionC(), q.getOptionD(), q.getType()
+                q.getId(),
+                q.getSongId(),
+                q.getText(),
+                q.getOptionA(),
+                q.getOptionB(),
+                q.getOptionC(),
+                q.getOptionD(),
+                q.getType(),
+                toLetter(q.getCorrect()) // <-- 9° argomento
         );
     }
+
 }

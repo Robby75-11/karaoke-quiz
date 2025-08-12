@@ -16,4 +16,5 @@ public class QuizQuestionPlayDto {
     private String optionC;
     private String optionD;
     private String type;
+    private String correct;
 }

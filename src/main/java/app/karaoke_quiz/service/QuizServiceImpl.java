@@ -1,5 +1,4 @@
 package app.karaoke_quiz.service;
-
 import app.karaoke_quiz.dto.AnswerDto;
 import app.karaoke_quiz.dto.QuizQuestionPlayDto;
 import app.karaoke_quiz.dto.QuizResultDto;
@@ -56,29 +55,27 @@ class QuizServiceImpl implements QuizService {
      */
     @Override
     public QuizResultDto submit(Long quizId, List<AnswerDto> answers) {
-        // Otteniamo tutte le domande del quiz per confrontare le risposte
         List<Question> questions = questionRepository.findByQuizId(quizId);
-
-        // Mappiamo le domande per un accesso veloce tramite ID
         Map<Long, Question> byId = questions.stream()
                 .collect(Collectors.toMap(Question::getId, Function.identity()));
 
         int correct = 0;
-        // Iteriamo su ogni risposta dell'utente per calcolare il punteggio
         for (AnswerDto a : answers) {
             Question q = byId.get(a.getQuestionId());
-            // Verifichiamo che la domanda esista e che la risposta dell'utente
-            // sia valida e corrisponda a quella corretta nel database
-            if (q != null && q.getCorrect() != null &&
-                    q.getCorrect().equalsIgnoreCase(a.getAnswer())) {
+            if (q == null) continue;
+
+            String expected = toLetter(q.getCorrect()); // "A"/"B"/"C"/"D"
+            String given = a.getAnswer() == null ? null : a.getAnswer().trim();
+
+            if (expected != null && expected.equalsIgnoreCase(given)) {
                 correct++;
             }
         }
-        // Restituiamo il risultato del quiz
         return new QuizResultDto(questions.size(), correct);
     }
 
     private QuizQuestionPlayDto toDto(Question q) {
+        String correctLetter = toLetter(q.getCorrect()); // "A"/"B"/"C"/"D"
         return new QuizQuestionPlayDto(
                 q.getId(),
                 q.getSongId(),
@@ -87,7 +84,21 @@ class QuizServiceImpl implements QuizService {
                 q.getOptionB(),
                 q.getOptionC(),
                 q.getOptionD(),
-                q.getType()
+                q.getType(),
+                correctLetter   // ✅ IMPORTANTISSIMO: passiamo la lettera, non "optionA"
         );
+    }
+
+    private String toLetter(String value) {
+        if (value == null) return null;
+        switch (value.trim().toLowerCase()) {
+            case "optiona": return "A";
+            case "optionb": return "B";
+            case "optionc": return "C";
+            case "optiond": return "D";
+            case "a": case "b": case "c": case "d":
+                return value.trim().toUpperCase(); // già lettera
+            default: return null;
+        }
     }
 }

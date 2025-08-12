@@ -99,6 +99,21 @@ class DatabaseInitializer {
             songOttoottootto1.setArtist(ottoottootto);
             songRepository.save(songOttoottootto1);
 
+            Song songOttoottootto2 = new Song();
+            songOttoottootto2.setTitle("Non me la menare"
+            );
+            songOttoottootto2.setAuthor("Max Pezzali");
+            songOttoottootto2.setArtist(ottoottootto);
+            songRepository.save(songOttoottootto2);
+
+            Song songOttoottootto3 = new Song();
+            songOttoottootto3.setTitle("Come Mai"
+            );
+            songOttoottootto3.setAuthor("Max Pezzali");
+            songOttoottootto3.setArtist(ottoottootto);
+            songRepository.save(songOttoottootto3);
+
+
             Song songVenditti1 = new Song();
             songVenditti1.setTitle("Notte prima degli esami");
             songVenditti1.setAuthor("Antonello Venditti");
@@ -123,6 +138,12 @@ class DatabaseInitializer {
             songQueen1.setArtist(queen);
             songRepository.save(songQueen1);
 
+            Song songQueen2 = new Song();
+            songQueen2.setTitle("Queen");
+            songQueen2.setAuthor("Freddie Mercury");
+            songQueen2.setArtist(queen);
+            songRepository.save(songQueen2);
+
 
             // QUIZ 1: Vasco Rossi
             Quiz quizVasco = new Quiz();
@@ -144,12 +165,12 @@ class DatabaseInitializer {
             Question qVasco2 = new Question();
             qVasco2.setQuiz(quizVasco);
             qVasco2.setSongId(songVasco2.getId());
-            qVasco2.setText("Quale canzone di Vasco Rossi contiene il verso 'Devi solo fare attenzione a non cadere giù...'?");
+            qVasco2.setText("Quale canzone di Vasco Rossi è più 'recente'?");
             qVasco2.setOptionA("Albachiara");
             qVasco2.setOptionB("Senza parole");
             qVasco2.setOptionC("Sally");
             qVasco2.setOptionD("Vivere");
-            qVasco2.setCorrect("C");
+            qVasco2.setCorrect("B");
             qVasco2.setType("TESTO");
             questionRepository.save(qVasco2);
 
@@ -158,7 +179,7 @@ class DatabaseInitializer {
             qVasco3.setSongId(songVasco3.getId());
             qVasco3.setText("Quale album contiene la canzone 'Senza parole'?");
             qVasco3.setOptionA("Vado al massimo");
-            qVasco3.setOptionB("Bollicine");
+            qVasco3.setOptionB("Senza parole");
             qVasco3.setOptionC("Siamo solo noi");
             qVasco3.setOptionD("Vivere o niente");
             qVasco3.setCorrect("D");
@@ -200,7 +221,7 @@ class DatabaseInitializer {
             qPino3.setSongId(songPino3.getId());
             qPino3.setText("Quale strumento suona Pino Daniele nella canzone 'Yes I know my way'?");
             qPino3.setOptionA("Chitarra acustica");
-            qPino3.setOptionB("Basso elettrico");
+            qPino3.setOptionB("Chitarra elettrica");
             qPino3.setOptionC("Pianoforte");
             qPino3.setOptionD("Sassofono");
             qPino3.setCorrect("B");
@@ -215,14 +236,38 @@ class DatabaseInitializer {
             Question q883_1 = new Question();
             q883_1.setQuiz(quiz883);
             q883_1.setSongId(songOttoottootto1.getId());
-            q883_1.setText("Chi ha ucciso l'Uomo Ragno, secondo la canzone?");
-            q883_1.setOptionA("L'assassino");
-            q883_1.setOptionB("Nessuno");
-            q883_1.setOptionC("Le iene");
-            q883_1.setOptionD("Lui stesso");
+            q883_1.setText("Di che album fa parte Come mai?");
+            q883_1.setOptionA("Hanno ucciso l'Uomo Ragno");
+            q883_1.setOptionB("Nessuno di questi");
+            q883_1.setOptionC("Nord Sud Ovest Est");
+            q883_1.setOptionD("Grazie Mille");
             q883_1.setCorrect("C");
             q883_1.setType("TESTO");
             questionRepository.save(q883_1);
+
+            Question q883_2 = new Question();
+            q883_2.setQuiz(quiz883);
+            q883_2.setSongId(songOttoottootto2.getId());
+            q883_2.setText("Qual è il titolo del singolo di debutto degli 883?");
+            q883_2.setOptionA("Hanno ucciso l'Uomo Ragno");
+            q883_2.setOptionB("Non me la menare");
+            q883_2.setOptionC("Nord Sud Ovest Est");
+            q883_2.setOptionD("Grazie Mille");
+            q883_2.setCorrect("B");
+            q883_2.setType("TESTO");
+            questionRepository.save(q883_2);
+
+            Question q883_3 = new Question();
+            q883_3.setQuiz(quiz883);
+            q883_3.setSongId(songOttoottootto3.getId());
+            q883_3.setText("Qual è il nome del singolo degli 883 che parla di una storia d'amore adolescenziale");
+            q883_3.setOptionA("Hanno ucciso l'Uomo Ragno");
+            q883_3.setOptionB("Non me la menare");
+            q883_3.setOptionC("Nord Sud Ovest Est");
+            q883_3.setOptionD("Come Mai");
+            q883_3.setCorrect("D");
+            q883_3.setType("TESTO");
+            questionRepository.save(q883_3);
 
             // QUIZ 4: Antonello Venditti
             Quiz quizVenditti = new Quiz();
@@ -232,11 +277,11 @@ class DatabaseInitializer {
             Question qVenditti1 = new Question();
             qVenditti1.setQuiz(quizVenditti);
             qVenditti1.setSongId(songVenditti1.getId());
-            qVenditti1.setText("Quale frase non è presente nella canzone 'Notte prima degli esami'?");
-            qVenditti1.setOptionA("Gli amici sono una cosa sola");
-            qVenditti1.setOptionB("Notte di lacrime e preghiere");
-            qVenditti1.setOptionC("La storia siamo noi");
-            qVenditti1.setOptionD("E la vita continua");
+            qVenditti1.setText("Chi Canta 'Notte prima degli esami'?");
+            qVenditti1.setOptionA("Lucio Dalla");
+            qVenditti1.setOptionB("Albano");
+            qVenditti1.setOptionC("Antonello Venditti");
+            qVenditti1.setOptionD("Renato Zero");
             qVenditti1.setCorrect("C");
             qVenditti1.setType("TESTO");
             questionRepository.save(qVenditti1);
@@ -249,12 +294,12 @@ class DatabaseInitializer {
             Question qAnnalisa1 = new Question();
             qAnnalisa1.setQuiz(quizAnnalisa);
             qAnnalisa1.setSongId(songAnnalisa1.getId());
-            qAnnalisa1.setText("Chi è il co-autore del brano 'Bellissima'?");
-            qAnnalisa1.setOptionA("Davide Simonetta");
-            qAnnalisa1.setOptionB("Dario Faini");
-            qAnnalisa1.setOptionC("Alessandro Raina");
-            qAnnalisa1.setOptionD("Paolo Antonacci");
-            qAnnalisa1.setCorrect("D");
+            qAnnalisa1.setText("Chi canta il brano 'Bellissima'?");
+            qAnnalisa1.setOptionA("Giorgia");
+            qAnnalisa1.setOptionB("Annalisa");
+            qAnnalisa1.setOptionC("Eros Ramazzotti");
+            qAnnalisa1.setOptionD("Biagio Antonacci");
+            qAnnalisa1.setCorrect("B");
             qAnnalisa1.setType("AUTORE");
             questionRepository.save(qAnnalisa1);
 
@@ -291,6 +336,20 @@ class DatabaseInitializer {
             qQueen1.setCorrect("B");
             qQueen1.setType("AUTORE");
             questionRepository.save(qQueen1);
+
+            Question qQueen2 = new Question();
+            qQueen2.setQuiz(quizQueen);
+            qQueen2.setSongId(songQueen1.getId());
+            qQueen2.setText("Qual è il nome del famoso gruppo rock britannico che ha avuto Freddie Mercury come frontman?");
+            qQueen2.setOptionA("Queen");
+            qQueen2.setOptionB("U2");
+            qQueen2.setOptionC("Duran Duran");
+            qQueen2.setOptionD("Gans Roses");
+            qQueen2.setCorrect("A");
+            qQueen2.setType("AUTORE");
+            questionRepository.save(qQueen2);
+
+
         };
     }
 }

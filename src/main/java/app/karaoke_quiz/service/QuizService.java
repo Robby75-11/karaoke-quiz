@@ -6,7 +6,6 @@ import app.karaoke_quiz.dto.QuizResultDto;
 
 import java.util.List;
 
-
 /**
  * Interfaccia per il servizio di gestione dei quiz.
  * Definisce i metodi per interagire con i quiz, come ottenere domande casuali
