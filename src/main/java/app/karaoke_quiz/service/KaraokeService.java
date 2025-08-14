@@ -13,7 +13,7 @@ public interface KaraokeService {
     List<SongResponseDto> searchSongs(String query);
     Optional<SongResponseDto> getSongById(Long id);
     List<SongResponseDto> getAllSongs();
-
+    Optional<LyricsDto> getLyricsByTitleArtist(String title, String artist); // ⬅️ nuovo
     Optional<LyricsDto> getLyricsBySongId(Long songId);
     Optional<ArtistDto> getArtistById(Long id);
 

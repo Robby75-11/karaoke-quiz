@@ -1,6 +1,7 @@
 package app.karaoke_quiz.controller;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,15 +35,14 @@ public class DeezerController {
      * @return Il JSON della risposta da Deezer.
      */
     @GetMapping("/search")
-    public Mono<String> searchTracks(@RequestParam("q") String query) {
+    public Mono<ResponseEntity<String>> searchTracks(@RequestParam("q") String query) {
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/search")
-                        .queryParam("q", query)
-                        .build())
-                .header("X-RapidAPI-Key", rapidApiKey) // ✅ Aggiunge l'header con la chiave API
-                .header("X-RapidAPI-Host", rapidApiHost) // ✅ Aggiunge l'header con l'host
+                .uri(uri -> uri.path("/search").queryParam("q", query).build())
+                .header("X-RapidAPI-Key", rapidApiKey)
+                .header("X-RapidAPI-Host", rapidApiHost)
                 .retrieve()
-                .bodyToMono(String.class);
+                .onStatus(s -> s.is4xxClientError() || s.is5xxServerError(),
+                        resp -> resp.bodyToMono(String.class).map(RuntimeException::new))
+                .toEntity(String.class);
     }
 }
