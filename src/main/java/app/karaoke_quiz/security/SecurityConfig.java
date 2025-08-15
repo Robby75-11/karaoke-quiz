@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/health").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll() // ✅ Deezer incluso
+                        .requestMatchers(HttpMethod.GET, "/api/deezer/**").permitAll() // ✅ Deezer incluso
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
