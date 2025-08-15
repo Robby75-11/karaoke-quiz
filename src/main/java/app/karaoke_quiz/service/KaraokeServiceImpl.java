@@ -28,7 +28,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class KaraokeServiceImpl implements KaraokeService {
 
-      @Qualifier("deezerClient")
+      @Qualifier("deezerRapidApiClient")
     private final WebClient deezerClient;
 
     @Qualifier("lyricsOvhClient")
