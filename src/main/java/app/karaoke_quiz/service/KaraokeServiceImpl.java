@@ -28,11 +28,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class KaraokeServiceImpl implements KaraokeService {
 
-      @Qualifier("deezerRapidApiClient")
-    private final WebClient deezerClient;
 
-    @Qualifier("lyricsOvhClient")
-    private final WebClient lyricsOvhClient;
+    private final @Qualifier("deezerRapidApiClient") WebClient deezerClient;
+    private final @Qualifier("lyricsOvhClient") WebClient lyricsOvhClient;
 
     private static final Logger log = LoggerFactory.getLogger(KaraokeServiceImpl.class);
 
