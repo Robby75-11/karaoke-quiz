@@ -27,8 +27,12 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class KaraokeServiceImpl implements KaraokeService {
+
     @Qualifier("geniusClient")
     private final WebClient geniusClient;
+
+    @Qualifier("deezerClient")
+    private final WebClient deezerClient;
 
     private static final Logger log = LoggerFactory.getLogger(KaraokeServiceImpl.class);
 
@@ -36,8 +40,7 @@ public class KaraokeServiceImpl implements KaraokeService {
     private final ArtistRepository artistRepository;
     private final QuestionRepository questionRepository;
     private final QuizRepository quizRepository;
-    private final LyricsRepository lyricsRepository;   // ⬅️ aggiunto
-    private final WebClient webClient;                 // ⬅️ configurato via WebClientConfig
+    private final LyricsRepository lyricsRepository;
 
     @Override
     public List<SongResponseDto> searchSongs(String query) {
@@ -45,8 +48,8 @@ public class KaraokeServiceImpl implements KaraokeService {
         return songRepository.findAll().stream()
                 .filter(s ->
                         (s.getAuthor() != null && s.getAuthor().toLowerCase().contains(q)) ||
-                                (s.getTitle()  != null && s.getTitle().toLowerCase().contains(q))  ||
-                                (s.getArtist()!= null && s.getArtist().getName()!=null &&
+                                (s.getTitle() != null && s.getTitle().toLowerCase().contains(q)) ||
+                                (s.getArtist() != null && s.getArtist().getName() != null &&
                                         s.getArtist().getName().toLowerCase().contains(q))
                 )
                 .map(this::toSongDto)
@@ -65,30 +68,26 @@ public class KaraokeServiceImpl implements KaraokeService {
 
     @Override
     public Optional<LyricsDto> getLyricsBySongId(Long songId) {
-        // 0) prova cache locale
-        try {
-            var local = lyricsRepository.findBySongId(songId);
-            if (local.isPresent()) {
-                var l = local.get();
-                log.debug("Lyrics trovati in locale per songId={}", songId);
-                return Optional.of(new LyricsDto(songId, l.getText(), l.getSyncData()));
-            }
-        } catch (Exception e) {
-            log.warn("Errore leggendo Lyrics locali per songId={}: {}", songId, e.getMessage());
+        // Cache locale
+        var local = lyricsRepository.findBySongId(songId);
+        if (local.isPresent()) {
+            var l = local.get();
+            return Optional.of(new LyricsDto(songId, l.getText(), l.getSyncData()));
         }
 
-        // 1) cerca il brano
+        // Recupera info brano
         var songOpt = songRepository.findById(songId);
         if (songOpt.isEmpty()) return Optional.empty();
         var song = songOpt.get();
+
         String title = Optional.ofNullable(song.getTitle()).orElse("");
         String artistName = Optional.ofNullable(song.getArtist())
                 .map(Artist::getName)
                 .orElse(Optional.ofNullable(song.getAuthor()).orElse(""));
 
-        // 2) fallback a Genius (metadati + URL pagina; niente testo reale via API)
+        // Chiamata a Genius
         try {
-            JsonNode genius = webClient.get()
+            JsonNode genius = geniusClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/search")
                             .queryParam("q", title + " " + artistName)
@@ -99,30 +98,49 @@ public class KaraokeServiceImpl implements KaraokeService {
 
             JsonNode hit = genius != null ? genius.at("/response/hits/0/result") : null;
             if (hit == null || hit.isMissingNode() || hit.get("path") == null) {
-                log.info("Nessun match Genius per '{}' - '{}'", title, artistName);
                 return Optional.empty();
             }
 
             String fullLyricsUrl = "https://genius.com" + hit.get("path").asText();
-
             String simulated = "Testi simulati per '" + title + "' di " + artistName +
                     ".\nGenius fornisce solo metadati/URL, non il testo completo.\n" +
                     "Pagina: " + fullLyricsUrl;
 
-            // (opzionale) salva in cache locale per usi futuri
-            try {
-                Lyrics l = new Lyrics();
-                l.setSong(song);
-                l.setText(simulated);
-                l.setSyncData("[]");
-                lyricsRepository.save(l);
-            } catch (Exception e) {
-                log.debug("Impossibile salvare i lyrics simulati in cache: {}", e.getMessage());
-            }
+            // Salva in cache
+            Lyrics l = new Lyrics();
+            l.setSong(song);
+            l.setText(simulated);
+            l.setSyncData("[]");
+            lyricsRepository.save(l);
 
             return Optional.of(new LyricsDto(songId, simulated, "[]"));
+
         } catch (Exception e) {
-            log.error("Errore chiamando Genius per '{}'/'{}': {}", title, artistName, e.getMessage());
+            log.error("Errore chiamando Genius: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<LyricsDto> getLyricsByTitleArtist(String title, String artistName) {
+        try {
+            JsonNode genius = geniusClient.get()
+                    .uri(u -> u.path("/search").queryParam("q", (title == null ? "" : title) + " " + (artistName == null ? "" : artistName)).build())
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .block();
+
+            JsonNode hit = genius != null ? genius.at("/response/hits/0/result") : null;
+            if (hit == null || hit.isMissingNode() || hit.get("path") == null) {
+                return Optional.empty();
+            }
+
+            String fullLyricsUrl = "https://genius.com" + hit.get("path").asText();
+            String simulated = "Testi simulati per '" + title + "' di " + artistName +
+                    ".\nGenius fornisce solo metadati/URL, non il testo completo.\nPagina: " + fullLyricsUrl;
+
+            return Optional.of(new LyricsDto(null, simulated, "[]"));
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
@@ -184,28 +202,5 @@ public class KaraokeServiceImpl implements KaraokeService {
                 q.getType(),
                 toLetter(q.getCorrect())
         );
-    }
-    @Override
-    public Optional<LyricsDto> getLyricsByTitleArtist(String title, String artistName) {
-        try {
-            JsonNode genius = webClient.get()
-                    .uri(u -> u.path("/search").queryParam("q", (title == null ? "" : title) + " " + (artistName == null ? "" : artistName)).build())
-                    .retrieve()
-                    .bodyToMono(JsonNode.class)
-                    .block();
-
-            JsonNode hit = genius != null ? genius.at("/response/hits/0/result") : null;
-            if (hit == null || hit.isMissingNode() || hit.get("path") == null) {
-                return Optional.empty();
-            }
-
-            String fullLyricsUrl = "https://genius.com" + hit.get("path").asText();
-            String simulated = "Testi simulati per '" + (title == null ? "" : title) + "' di " + (artistName == null ? "" : artistName) +
-                    ".\nGenius fornisce solo metadati/URL, non il testo completo.\nPagina: " + fullLyricsUrl;
-
-            return Optional.of(new LyricsDto(null, simulated, "[]"));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
     }
 }
