@@ -17,6 +17,7 @@ public interface KaraokeService {
     Optional<LyricsDto> getLyricsBySongId(Long songId);
     Optional<ArtistDto> getArtistById(Long id);
 
+
     Optional<Long> getRandomQuizId();
     List<QuizQuestionPlayDto> getQuizQuestions(Long quizId);
 }

@@ -37,11 +37,11 @@ public class LyricsController {
             @RequestParam(required = false) String artist) {
 
         // 1) Prova DB locale con songId
-        var local = lyricsService.getLyricsBySongId(songId);
+        var local = karaokeService.getLyricsBySongId(songId);
         if (local.isPresent()) {
             var l = local.get();
             return ResponseEntity.ok(Map.of(
-                    "songId", l.getSong() != null ? l.getSong().getId() : songId,
+                    "songId",  songId,
                     "lyrics", l.getText(),
                     "sync", l.getSyncData()
             ));
