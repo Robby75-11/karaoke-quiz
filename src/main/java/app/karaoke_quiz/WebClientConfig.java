@@ -1,5 +1,6 @@
 package app.karaoke_quiz;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,10 +21,14 @@ public class WebClientConfig {
     /**
      * WebClient per Deezer ufficiale
      */
-    @Bean
-    public WebClient deezerClient(WebClient.Builder builder) {
+    @Bean(name = "deezerRapidApiClient")
+    public WebClient deezerRapidApiClient(WebClient.Builder builder,
+                                          @Value("${deezer.rapidapi.key}") String apiKey,
+                                          @Value("${deezer.rapidapi.host}") String apiHost) {
         return builder
-                .baseUrl("https://api.deezer.com")
+                .baseUrl("https://deezerdevs-deezer.p.rapidapi.com")
+                .defaultHeader("X-RapidAPI-Key", apiKey)
+                .defaultHeader("X-RapidAPI-Host", apiHost)
                 .build();
     }
 }
