@@ -22,13 +22,8 @@ public class WebClientConfig {
      * WebClient per Deezer ufficiale
      */
     @Bean(name = "deezerRapidApiClient")
-    public WebClient deezerRapidApiClient(WebClient.Builder builder,
-                                          @Value("${deezer.rapidapi.key}") String apiKey,
-                                          @Value("${deezer.rapidapi.host}") String apiHost) {
-        return builder
-                .baseUrl("https://deezerdevs-deezer.p.rapidapi.com")
-                .defaultHeader("X-RapidAPI-Key", apiKey)
-                .defaultHeader("X-RapidAPI-Host", apiHost)
-                .build();
+    public WebClient deezerRapidApiClient(WebClient.Builder builder) {
+        return builder.baseUrl("https://deezerdevs-deezer.p.rapidapi.com").build();
+
     }
 }
