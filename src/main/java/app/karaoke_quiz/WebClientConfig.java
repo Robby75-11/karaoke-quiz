@@ -18,4 +18,12 @@ public class WebClientConfig {
                 .defaultHeader(org.springframework.http.HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .build();
     }
+
+    @Bean
+    @Qualifier("deezerClient")
+    public WebClient deezerClient(WebClient.Builder b) {
+        return b.baseUrl("https://deezerdevs-deezer.p.rapidapi.com")
+                .build();
+    }
+
 }

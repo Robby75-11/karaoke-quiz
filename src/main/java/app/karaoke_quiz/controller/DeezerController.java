@@ -1,11 +1,9 @@
 package app.karaoke_quiz.controller;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -13,26 +11,22 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/deezer")
 public class DeezerController {
 
-    // ✅ Inietta la chiave API dal file application.properties
-    @Value("${deezer.rapidapi.key}")
-    private String rapidApiKey;
-
-    @Value("${deezer.rapidapi.host}")
-    private String rapidApiHost;
-
     private final WebClient webClient;
+    private final String rapidApiKey;
+    private final String rapidApiHost;
 
-    public DeezerController(WebClient.Builder webClientBuilder) {
-        // ✅ Aggiorna il WebClient per usare l'host corretto
-        this.webClient = webClientBuilder.baseUrl("https://deezerdevs-deezer.p.rapidapi.com").build();
+    public DeezerController(
+            @Qualifier("deezerClient") WebClient webClient,
+            @Value("${deezer.rapidapi.key:${DEEZER_RAPIDAPI_KEY}}") String rapidApiKey,
+            @Value("${deezer.rapidapi.host:${DEEZER_RAPIDAPI_HOST}}") String rapidApiHost
+    ) {
+        this.webClient = webClient;
+        this.rapidApiKey = rapidApiKey;
+        this.rapidApiHost = rapidApiHost;
     }
 
     /**
-     * Endpoint per la ricerca di brani su Deezer.
-     * Agisce come proxy per evitare di esporre la chiave API e risolvere i problemi di CORS.
-     *
-     * @param query La stringa di ricerca.
-     * @return Il JSON della risposta da Deezer.
+     * Proxy di ricerca su Deezer per evitare CORS e nascondere la chiave API.
      */
     @GetMapping("/search")
     public Mono<ResponseEntity<String>> searchTracks(@RequestParam("q") String query) {
@@ -41,8 +35,10 @@ public class DeezerController {
                 .header("X-RapidAPI-Key", rapidApiKey)
                 .header("X-RapidAPI-Host", rapidApiHost)
                 .retrieve()
-                .onStatus(s -> s.is4xxClientError() || s.is5xxServerError(),
-                        resp -> resp.bodyToMono(String.class).map(RuntimeException::new))
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        resp -> resp.bodyToMono(String.class).map(RuntimeException::new)
+                )
                 .toEntity(String.class);
     }
 }
