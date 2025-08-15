@@ -31,7 +31,8 @@ public class KaraokeServiceImpl implements KaraokeService {
       @Qualifier("deezerClient")
     private final WebClient deezerClient;
 
-    private static final String LYRICS_API_URL = "https://api.lyrics.ovh/v1";
+    @Qualifier("lyricsOvhClient")
+    private final WebClient lyricsOvhClient;
 
     private static final Logger log = LoggerFactory.getLogger(KaraokeServiceImpl.class);
 
@@ -89,13 +90,20 @@ public class KaraokeServiceImpl implements KaraokeService {
     }
 
     @Override
-    public Optional<LyricsDto> getLyricsByTitleArtist(String title, String artistName) {
-        if (title == null || title.isBlank() || artistName == null || artistName.isBlank()) {
+    public Optional<LyricsDto> getLyricsByTitleArtist(String title, String artist) {
+        try {
+            String response = lyricsOvhClient.get()
+                    .uri("/{artist}/{title}", artist, title)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            return Optional.of(new LyricsDto(null, response, "[]"));
+        } catch (Exception e) {
+            log.error("Errore chiamando Lyrics OVH: {}", e.getMessage());
             return Optional.empty();
         }
-        return fetchAndSaveLyrics(null, null, title, artistName);
     }
-
     // 🎨 Recupero artista
     @Override
     public Optional<ArtistDto> getArtistById(Long id) {
@@ -118,12 +126,14 @@ public class KaraokeServiceImpl implements KaraokeService {
                 .toList();
     }
 
-    // 🔧 Funzione comune per chiamata lyrics.ovh
+    // 🔧 Chiamata lyrics.ovh e salvataggio
     private Optional<LyricsDto> fetchAndSaveLyrics(Song song, Long songId, String title, String artistName) {
         try {
-            String url = LYRICS_API_URL + "/" + artistName + "/" + title;
-            RestTemplate restTemplate = new RestTemplate();
-            Map<?, ?> response = restTemplate.getForObject(url, Map.class);
+            Map<?, ?> response = lyricsOvhClient.get()
+                    .uri("/{artist}/{title}", artistName, title)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
 
             if (response != null && response.containsKey("lyrics")) {
                 String lyricsText = (String) response.get("lyrics");
