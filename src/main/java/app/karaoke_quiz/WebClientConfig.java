@@ -8,25 +8,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${deezer.rapidapi.key}")
-    private String deezerApiKey;
-
-    @Value("${deezer.rapidapi.host}")
-    private String deezerApiHost;
-
-    @Bean("deezerRapidApiClient")
+    @Bean
     public WebClient deezerRapidApiClient(WebClient.Builder builder) {
         return builder
-                .baseUrl("https://deezerdevs-deezer.p.rapidapi.com")
-                .defaultHeader("X-RapidAPI-Key", deezerApiKey)
-                .defaultHeader("X-RapidAPI-Host", deezerApiHost)
+                .baseUrl("https://api.deezer.com") // URL base Deezer
                 .build();
     }
 
-    @Bean("lyricsOvhClient")
+    @Bean
     public WebClient lyricsOvhClient(WebClient.Builder builder) {
         return builder
-                .baseUrl("https://api.lyrics.ovh/v1")
+                .baseUrl("https://api.lyrics.ovh/v1") // URL base Lyrics.ovh
                 .build();
     }
 }
