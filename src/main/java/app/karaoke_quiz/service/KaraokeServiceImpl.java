@@ -14,10 +14,9 @@ import app.karaoke_quiz.repository.LyricsRepository;
 import app.karaoke_quiz.repository.QuestionRepository;
 import app.karaoke_quiz.repository.QuizRepository;
 import app.karaoke_quiz.repository.SongRepository;
-import org.springframework.web.client.RestTemplate;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,20 +24,36 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class KaraokeServiceImpl implements KaraokeService {
 
-
-    private final @Qualifier("deezerRapidApiClient") WebClient deezerClient;
-    private final @Qualifier("lyricsOvhClient") WebClient lyricsOvhClient;
-
-    private static final Logger log = LoggerFactory.getLogger(KaraokeServiceImpl.class);
-
+    private final WebClient deezerClient;
+    private final WebClient lyricsOvhClient;
     private final SongRepository songRepository;
     private final ArtistRepository artistRepository;
     private final QuestionRepository questionRepository;
     private final QuizRepository quizRepository;
     private final LyricsRepository lyricsRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(KaraokeServiceImpl.class);
+
+    @Autowired
+    public KaraokeServiceImpl(
+            @Qualifier("deezerRapidApiClient") WebClient deezerClient,
+            @Qualifier("lyricsOvhClient") WebClient lyricsOvhClient,
+            SongRepository songRepository,
+            ArtistRepository artistRepository,
+            QuestionRepository questionRepository,
+            QuizRepository quizRepository,
+            LyricsRepository lyricsRepository
+    ) {
+        this.deezerClient = deezerClient;
+        this.lyricsOvhClient = lyricsOvhClient;
+        this.songRepository = songRepository;
+        this.artistRepository = artistRepository;
+        this.questionRepository = questionRepository;
+        this.quizRepository = quizRepository;
+        this.lyricsRepository = lyricsRepository;
+    }
 
     @Override
     public List<SongResponseDto> searchSongs(String query) {
@@ -66,14 +81,12 @@ public class KaraokeServiceImpl implements KaraokeService {
 
     @Override
     public Optional<LyricsDto> getLyricsBySongId(Long songId) {
-        // Cache locale
         var local = lyricsRepository.findBySongId(songId);
         if (local.isPresent()) {
             var l = local.get();
             return Optional.of(new LyricsDto(songId, l.getText(), l.getSyncData()));
         }
 
-        // Recupera info brano
         var songOpt = songRepository.findById(songId);
         if (songOpt.isEmpty()) return Optional.empty();
         var song = songOpt.get();
@@ -83,7 +96,6 @@ public class KaraokeServiceImpl implements KaraokeService {
                 .map(Artist::getName)
                 .orElse(Optional.ofNullable(song.getAuthor()).orElse(""));
 
-        // 3) Chiamata a lyrics.ovh
         return fetchAndSaveLyrics(song, songId, title, artistName);
     }
 
@@ -102,13 +114,12 @@ public class KaraokeServiceImpl implements KaraokeService {
             return Optional.empty();
         }
     }
-    // 🎨 Recupero artista
+
     @Override
     public Optional<ArtistDto> getArtistById(Long id) {
         return artistRepository.findById(id).map(this::toArtistDto);
     }
 
-    // 🎯 Quiz
     @Override
     public Optional<Long> getRandomQuizId() {
         List<Quiz> all = quizRepository.findAll();
@@ -124,7 +135,6 @@ public class KaraokeServiceImpl implements KaraokeService {
                 .toList();
     }
 
-    // 🔧 Chiamata lyrics.ovh e salvataggio
     private Optional<LyricsDto> fetchAndSaveLyrics(Song song, Long songId, String title, String artistName) {
         try {
             Map<?, ?> response = lyricsOvhClient.get()
@@ -136,7 +146,6 @@ public class KaraokeServiceImpl implements KaraokeService {
             if (response != null && response.containsKey("lyrics")) {
                 String lyricsText = (String) response.get("lyrics");
 
-                // Salva in DB se ho un Song
                 if (song != null) {
                     Lyrics l = new Lyrics();
                     l.setSong(song);
@@ -153,7 +162,6 @@ public class KaraokeServiceImpl implements KaraokeService {
         return Optional.empty();
     }
 
-    // ---------- mappers ----------
     private SongResponseDto toSongDto(Song s) {
         Long artistId = s.getArtist() != null ? s.getArtist().getId() : null;
         String artistName = s.getArtist() != null ? s.getArtist().getName() : null;
